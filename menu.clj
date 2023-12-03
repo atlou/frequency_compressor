@@ -1,8 +1,20 @@
 (ns menu
   (:require [clojure.string :as str])
-  (:require [io :refer [read-file]]))
+  (:require [clojure.java.io :as io])
+  (:require [compress :refer [compress-file]]))
   ; this is where you would also include/require the compress module
 
+; Verify if file exists in the current directory
+(defn file-exists?
+  "Returns true if a file exists.
+   Returns false otherwise."
+  [filename]
+  (.exists (io/file (str "./" filename))))
+
+; Read file from root directory
+(defn read-file 
+  [filename]
+  (slurp (str "./" filename)))
 
 ; Display the menu and ask the user for the option
 (defn showMenu
@@ -19,27 +31,22 @@
     (flush) 
     (read-line)))
 
-; Verify if file exists in the current directory
-(defn file-exists?
-  "Returns true if a file exists.
-   Returns false otherwise."
-  [filename]
-  (.exists (io/file (str "./" filename))))
-
 
 ; Display all files in the current folder
+; TODO: make more clean display and only read files from the root directory
 (def files-in-root 
   (filter #(and (.isFile %) (not (.isDirectory %))) 
           (file-seq (io/file "."))))
 
 (defn print-files
   [files] 
+  (println)
   (doseq [file files] 
     (println (.getName file))))
 
 (defn option1
   [] 
-  (print-files)
+  (print-files files-in-root)
   (flush))
     
 ; Read and display the file contents (if the file exists). Java's File class can be used to 
@@ -48,10 +55,12 @@
   []
   (print "\nPlease enter a file name => ") 
   (flush)
-  (let [file_name (read-line)]
-    (println read-file))
-
-
+  (let [filename (read-line)]
+    (println)
+    (if (file-exists? filename) 
+      (println (read-file filename))
+      (println "Error: the file does not exist."))
+    (flush)))
 
 ; Compress the (valid) file provided by the user. You will replace the println expression with code 
 ; that calls your compression function
@@ -59,9 +68,14 @@
   [] ;parm(s) can be provided here, if needed
   (print "\nPlease enter a file name => ") 
   (flush)
-  (let [file_name (read-line)]
-     (println "now compress" file_name "with with the functions(s) you provide in compress.clj")))
-
+  (let [filename (read-line)]
+    (println)
+    (if (file-exists? filename)
+      (do 
+        (compress-file filename)
+        (println "Compressed the file to a new file" (str filename ".ct"))) 
+      (println "Error: the file does not exist."))
+    (flush)))
 
 ; Decompress the (valid) file provided by the user. You will replace the println expression with code 
 ; that calls your decompression function

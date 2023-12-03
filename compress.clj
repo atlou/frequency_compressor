@@ -70,5 +70,3 @@
   "Creates a compressed version of a .txt file."
   [filename]
   (write-file (str filename ".ct") (compress-string (slurp (str "./" filename)))))
-
-(compress-file "text.txt")
