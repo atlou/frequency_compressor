@@ -1,14 +1,12 @@
 (ns compress
-  (:require [clojure.string :as str])
-  (:require [io :refer [write-file]])
-  (:require [io :refer [read-file]]))
+  (:require [clojure.string :as str]))
 
 (defn split-space
   "Splits a string on whitespace"
   [string]
   (str/split string #"[\n\r\s]+"))
 
-(def frequency-list (distinct (split-space (read-file "frequency.txt"))))
+(def frequency-list (distinct (split-space (slurp "./frequency.txt"))))
 
 (defn get-word-frequency
   "Returns the index of the word in the frequency.txt file"
@@ -63,9 +61,14 @@
     (str/join " " (for [t tokens]
         (process-token t)))))
 
+(defn write-file
+  "Writes a string to a file."
+  [filename, string]
+  (spit (str filename) string))
+
 (defn compress-file
   "Creates a compressed version of a .txt file."
   [filename]
-  (write-file (str filename ".ct") (compress-string (read-file filename))))
+  (write-file (str filename ".ct") (compress-string (slurp (str "./" filename)))))
 
 (compress-file "text.txt")

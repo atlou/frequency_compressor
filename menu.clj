@@ -1,5 +1,4 @@
 (ns menu
-  (:require [display-files :refer [print-files]])
   (:require [clojure.string :as str])
   (:require [io :refer [read-file]]))
   ; this is where you would also include/require the compress module
@@ -20,14 +19,28 @@
     (flush) 
     (read-line)))
 
+; Verify if file exists in the current directory
+(defn file-exists?
+  "Returns true if a file exists.
+   Returns false otherwise."
+  [filename]
+  (.exists (io/file (str "./" filename))))
+
 
 ; Display all files in the current folder
+(def files-in-root 
+  (filter #(and (.isFile %) (not (.isDirectory %))) 
+          (file-seq (io/file "."))))
+
+(defn print-files
+  [files] 
+  (doseq [file files] 
+    (println (.getName file))))
+
 (defn option1
   [] 
   (print-files)
   (flush))
-    
-    
     
 ; Read and display the file contents (if the file exists). Java's File class can be used to 
 ; check for existence first. 
