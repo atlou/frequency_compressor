@@ -1,5 +1,4 @@
 (ns app
-  (:require [db])
   (:gen-class)) 
 
 (defn do-something 
@@ -10,5 +9,6 @@
 (defn -main 
   "TODO"
   [& _args]
-  (do-something 10 20)
-  (db/db))
+  (do-something 10 20))
+
+(-main)
