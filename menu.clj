@@ -1,7 +1,8 @@
 (ns menu
   (:require [clojure.string :as str])
   (:require [clojure.java.io :as io])
-  (:require [compress :refer [compress-file]]))
+  (:require [compress :refer [compress-file]])
+  (:require [compress :refer [decompress-file]]))
   ; this is where you would also include/require the compress module
 
 ; Verify if file exists in the current directory
@@ -64,28 +65,41 @@
 
 ; Compress the (valid) file provided by the user. You will replace the println expression with code 
 ; that calls your compression function
+(defn txt-file?
+  [filename]
+  (boolean (re-matches #".*\.txt" filename)))
+
 (defn option3
   [] ;parm(s) can be provided here, if needed
   (print "\nPlease enter a file name => ") 
   (flush)
   (let [filename (read-line)]
     (println)
-    (if (file-exists? filename)
+    (if (and (txt-file? filename)(file-exists? filename))
       (do 
         (compress-file filename)
         (println "Compressed the file to a new file" (str filename ".ct"))) 
-      (println "Error: the file does not exist."))
+      (println "Error: the file does not exist or is not a .txt file."))
     (flush)))
 
 ; Decompress the (valid) file provided by the user. You will replace the println expression with code 
 ; that calls your decompression function
+(defn ct-file?
+  [filename]
+  (boolean (re-matches #".*\.ct" filename)))
+
 (defn option4
   [] ;parm(s) can be provided here, if needed
   (print "\nPlease enter a file name => ") 
   (flush)
-  (let [file_name (read-line)]
-     (println "now decompress" file_name "with with the functions(s) you provide in compress.clj")))
-
+  (let [filename (read-line)]
+    (println)
+    (if (and (ct-file? filename)(file-exists? filename))
+      (do 
+        (decompress-file filename)
+        (println "Deompressed the file to a new file" (str/replace filename ".txt.ct" ".txt")))
+      (println "Error: the file does not exist or is not a .ct file."))
+    (flush)))
 
 ; If the menu selection is valid, call the relevant function to 
 ; process the selection

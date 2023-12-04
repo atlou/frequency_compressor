@@ -136,8 +136,8 @@
   "Processes the decompression of all tokens of a string."
   [string]
   (let [tokens (split-space string)]
-    (for [t tokens]
-      (decomp-process-token t))))
+    (str/join " " (for [t tokens]
+      (decomp-process-token t)))))
 
 (defn capitalize
   "Capitalizes the first letter of a string, without lowercasing all the other characters."
@@ -152,26 +152,26 @@
 
 (defn split-sentences
   "Splits a string in a sequence of sentences by splitting where the punctuation is.
-   Returns an interlaced vector of sentences and punctuation."
-  [string]
-  (interleave (capitalize-sentences(extract-sentences string)) (extract-punctuation string)))
+   Capitalizes each sentence.
+   Returns an interlaced vector of capitalized sentences and punctuation."
+  [s]
+  (let [pun (extract-punctuation s)
+        sen (capitalize-sentences (extract-sentences s))]
+    (if (empty? pun)
+      sen
+      (interleave sen pun))))
+
+(defn format-sentences
+  [s]
+  (str/join " " (split-sentences s)))
 
 (defn decompress-string
-  "Decompresses a string by first decompressing all tokens. 
-   It then joins the tokens together, 
-   and splits the string again in sentences after capitalizing all sentences.
-   It finally joins them again and formats the string according to basic english formatting rules."
-  [string]
-  (let [t (str/join " " (decompress-tokens string)) 
-        c (str/join " " (split-sentences t))]
-      (process-special c)))
+  [s]
+  (str/trim (process-special (format-sentences (decompress-tokens s)))))
 
 (defn decompress-file
   "Creates a decompressed version of a .ct file."
   [filename]
   (let [f (str/replace filename ".txt.ct" ".txt")
-        d (decompress-string (slurp (str "./" f)))]
+        d (decompress-string (slurp (str "./" filename)))]
   (write-file f d)))
-
-(decompress-string "0 1686  374 , 402 Oz , 2280 0 @416@ 148 617 - 2 18 ( 2156 ) 4103 - 14 23 4 0 957 @ 734 [ 250 , 230 ] . 6 8 759 0 1524 295 ?")
-(decompress-file "text.txt.ct")
