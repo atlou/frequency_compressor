@@ -114,8 +114,6 @@
          (recur )))))   ; other args(s) can be passed here, if needed
 
 
-
-
 ; ------------------------------
 ; Run the program. You might want to prepare the data required for the mapping operations
 ; before you display the menu. You don't have to do this but it might make some things easier
