@@ -34,16 +34,17 @@
 
 
 ; Display all files in the current folder
-; TODO: make more clean display and only read files from the root directory
 (def files-in-root 
-  (filter #(and (.isFile %) (not (.isDirectory %))) 
-          (file-seq (io/file "."))))
+  (let [root (io/file ".")]
+  (filter #(and (.isFile %) (not (.isDirectory %)) (= (.getParentFile %) root)) 
+          (file-seq root))))
 
 (defn print-files
   [files] 
   (println)
+  (println "File list:")
   (doseq [file files] 
-    (println (.getName file))))
+    (println "*" (str "./" (.getName file)))))
 
 (defn option1
   [] 
